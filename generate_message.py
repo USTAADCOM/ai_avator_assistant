@@ -17,7 +17,7 @@ def generate(text = " "):
         user message or text.
     Return
     ------
-        return generated blog or essay.
+        return generated response.
     """
     full_text =  ""
     messages=[
@@ -40,7 +40,7 @@ def generate(text = " "):
         # stream = True,
         stop = None
     )
-    return response['choices'][0]['text']
+    return response.choices[0].message["content"]
     # try:
     #     for chunk in response:
     #         chunk_message = chunk['choices'][0]['delta'].get("content")
