@@ -2,20 +2,7 @@
 app main module
 """
 import gradio as gr
-import pyttsx3
-def create_avator_audio(text):
-    """
-    doc
-    """
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 150)
-    engine.setProperty('volume', 0.8)
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id)
-    # engine.say(text)
-    engine.save_to_file(text, 'male.wav')
-    engine.setProperty('voice', voices[0].id)
-    engine.save_to_file(text, 'female.wav')
+from generate_message import generate_response, set_user_response
 def get_video(gender):
     """
     doc
@@ -23,7 +10,7 @@ def get_video(gender):
     if gender == "male":
         return "male.wav"
     return "female.wav"
-with gr.Blocks(theme = gr.themes.Monochrome()) as app:
+with gr.Blocks(theme = gr.themes.Soft()) as app:
     gr.Markdown(
         '''
         <div style="text-align:center;">
@@ -35,8 +22,8 @@ with gr.Blocks(theme = gr.themes.Monochrome()) as app:
         with gr.Row():
             with gr.Column(scale = 2):
                 chatbot = gr.Chatbot()
-                msg = gr.Textbox(label="USER", placeholder = "Enter user message here")
-                submit_button = gr.Button("Submit")
+                message = gr.Textbox(label="USER", placeholder = "Enter user message here")
+                state = gr.State()
         with gr.Row():
             with gr.Column(scale = 2):
                 output_video = gr.Video(label = "Avator Video").style(height="300px")
@@ -56,6 +43,9 @@ with gr.Blocks(theme = gr.themes.Monochrome()) as app:
                 inputs = female,
                     outputs = [output_video]
                 )
+            message.submit(set_user_response, [message, chatbot],
+                           [message, chatbot],
+                           queue=False).then(generate_response, chatbot, chatbot)
 if __name__=="__main__":
     app.queue(concurrency_count = 1)
     app.launch(debug = True, enable_queue = True, share = True)
